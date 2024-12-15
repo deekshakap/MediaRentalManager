@@ -1,0 +1,241 @@
+package mediaRentalManager;
+import java.util.ArrayList;
+import java.util.Collections;
+
+
+ public class MediaRentalManager implements MediaRentalManagerInt {
+	 private ArrayList<Customer> customerInformation;
+	 private ArrayList<Media> mediaInformation;
+	 private int limitedPlanLimit;
+	 
+	 public MediaRentalManager() {
+		 //default constructor
+		 customerInformation = new ArrayList<>();
+		 mediaInformation = new ArrayList<>();
+		 //sets limit for limited plan customers
+		 limitedPlanLimit = 2;
+	 }
+	 
+	 public void addCustomer(String name, String address, String plan) {
+		 //if customer exists then it does nothing
+	       for(Customer customer: customerInformation) {
+	    	   if(customer.getName().equals(name)) {
+	    		   return;
+	    	   }
+	       }
+	       //adds customer 
+	       customerInformation.add(new Customer(name, address, plan));
+	 }
+	 
+	 public void addMovie(String title, int copiesAvailable, String rating) {
+	     //when asked add the movie object with given attributes
+	        Movie movie = new Movie(title, copiesAvailable, rating);
+	        mediaInformation.add(movie);
+	    }
+	 
+	 public void addAlbum(String title, int copiesAvailable, String artist, String songs) {
+		 //when asked add the album object with the given attributes 
+	        Album album = new Album(title, copiesAvailable, artist, songs);
+	        mediaInformation.add(album);
+	    }
+	 
+	 public void setLimitedPlanLimit(int hold) {
+		//sets the given value for the limited plan if not default
+		 this.limitedPlanLimit = hold;
+	 }
+	 
+	 public String getAllCustomersInfo() {
+		   //sorts all customers by their names 
+		    Collections.sort(customerInformation, (c1, c2) -> c1.getName().compareTo(c2.getName()));
+		    
+		    StringBuilder hold = new StringBuilder();
+		    hold.append("***** Customers' Information *****\n");
+		    for (Customer customers : customerInformation) {
+		    	hold.append(customers.toString()).append("\n");
+		    }
+		    return hold.toString();
+		    
+		}
+	 
+	 public String getAllMediaInfo() {
+		 //sorts all media by their names 
+		 Collections.sort(mediaInformation, (m1, m2) -> m1.getTitle().compareTo(m2.getTitle()));
+		    
+		    StringBuilder hold = new StringBuilder();
+		    hold.append("***** Media Information *****\n");
+		    for (Media media : mediaInformation) {
+		    	hold.append(media.getInfo()).append("\n");
+		    }
+		    return hold.toString();
+	    }
+
+	 
+	 public boolean addToQueue(String customerName, String mediaTitle) {
+		 Customer customer = findCustomerByName(customerName);
+		 //condition for if customer is not found 
+		 if(customer == null) {
+			 return false;
+		 }
+		 Media media = findMediaByTitle(mediaTitle);
+		 //condition for if media is not found
+		 if(media == null) {
+			 return false;
+		 }
+		 return customer.addToRequestQueue(mediaTitle);
+	    }
+	 
+	 public boolean removeFromQueue(String customerName, String mediaTitle) {
+		Customer customer = findCustomerByName(customerName);
+		//condition if customer is not found
+		if(customer == null) {
+			return false;
+		}
+		return customer.removeFromRequestQueue(mediaTitle);
+	 }
+	 
+	 public String processRequests() {
+	        StringBuilder hold = new StringBuilder();
+	        
+           //sorts all customers by name
+	       Collections.sort(customerInformation, (c1, c2) -> c1.getName().compareTo(c2.getName()));
+	       for(Customer customer : customerInformation) {
+	    	   ArrayList <String> queue = new ArrayList<>(customer.getRequestQueue());
+	    	   int maxRentLimit = customer.getPlan().equals("LIMITED") ? 2 : Integer.MAX_VALUE;
+	    	   int rentCount = 0;
+	    	   //discovers each media associate with each of the customer
+	    	   for(String mediaTitle : queue) {
+	    		   if (rentCount >= maxRentLimit) {
+	    			   break;
+	    		   }
+	    		   //finds media title that needs to be found
+	    		   Media media = findMediaByTitle(mediaTitle);
+	    		   if(media == null || media.getCopiesAvailable() == 0) {
+	    			   continue;
+	    		   }
+	    		   //decreases the copies of the media by renting it 
+	    		   customer.rentMedia(mediaTitle);
+	    		   media.decreaseCopiesAvailable();
+	    		   customer.getRequestQueue().remove(mediaTitle);
+	    		   //appends the hold for renting the required media 
+	    		   hold.append("Sending ").append(mediaTitle).append(" to ").append(customer.getName());
+	    		   //increments to stay updated 
+	    		   rentCount++;
+	    	   }
+	       }
+	       return hold.toString();
+	    }
+	 
+	 public boolean returnMedia(String customerName, String mediaTitle) {
+	        Customer customer = findCustomerByName(customerName);
+	        //condition for when customer not found
+	        if(customer == null) {
+	        	return false;
+	        }
+	        Media media = findMediaByTitle(mediaTitle);
+	        if (media == null) {
+	        	return false;
+	        }
+	        if(customer.returnMedia(mediaTitle)) {
+	        	media.increaseCopiesAvailable();
+	        	return true;
+	        }
+	        return false;
+	    }
+		   
+	 public ArrayList<String> searchMedia(String title, String rating, String artist, String songs) 
+	 {
+		    ArrayList<String> hold = new ArrayList<>();
+
+		    for (Media media : mediaInformation) 
+		    {
+		        boolean matches = true;
+
+		        //checks title to see if it matches 
+		        if (title != null && !media.getTitle().equalsIgnoreCase(title)) 
+		        {
+		            matches = false;
+		        }
+
+		        //checks movie to see if it matches
+		        if (rating != null && media instanceof Movie)
+		        {
+		            if (!((Movie) media).getRating().equalsIgnoreCase(rating))
+		            {
+		                matches = false;
+		            }
+		        }
+		        //checks if even when rating is provided that it is movie
+		        else if (rating != null) 
+		        {
+		        	matches = false;
+		        }
+                //checks artist to see if it matches 
+		        if(artist != null && media instanceof Album) 
+		        {
+		        	if(!((Album) media).getArtist().equalsIgnoreCase(artist))
+		        	{
+		        		matches = false;
+		        	}
+		        }
+		        else if (artist != null) 
+		        {
+		        	matches = false;
+		        }
+		        
+		        if(songs != null && media instanceof Album)
+		        {
+		        	String[] albumSongs = ((Album) media).getSongs().split(", ");
+		        	boolean songFound = false;
+		        	for (String song : albumSongs) 
+		        	{
+		        		if(song.equalsIgnoreCase(songs))
+		        		{
+		        			songFound = true;
+		        			break;
+		        		}
+		        	}
+		        	if(!songFound) 
+		        	{
+		        		matches = false;
+		        	}
+		        }
+		        	//checks if even when rating is provided that it is movie
+		        	else if (songs != null) 
+		        	{
+		        		matches = false;
+		        	}
+		        	if(matches) 
+		        	{
+		        		hold.add(media.getTitle());
+		        	}
+		       }
+		    
+		        Collections.sort(hold);
+		        return hold;
+		    }
+	 
+	   
+		   private Customer findCustomerByName(String name) {
+			   //methods to find a specific name in the Customer class 
+			 for (Customer customer : customerInformation) {
+				 if(customer.getName().equals(name)) {
+					 return customer;
+				 }
+			 }
+			 return null;
+		   }
+		   
+		   private Media findMediaByTitle(String title) {
+			   //method to find a specific title in the Media class 
+			   for (Media media : mediaInformation) {
+				   if(media.getTitle().equals(title)) {
+					   return media;
+				   }
+			   }
+			   return null;
+		   }
+	 }
+		    
+	 
+	 
+ 
