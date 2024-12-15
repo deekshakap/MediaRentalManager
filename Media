@@ -1,0 +1,11 @@
+package mediaRentalManager;
+
+public interface Media {
+	//required method declaration to be implemented in the classes that implement the interface
+	String getTitle();
+	int getCopiesAvailable();
+	void decreaseCopiesAvailable();
+	void increaseCopiesAvailable();
+	String getInfo();
+	String getRating();
+}
