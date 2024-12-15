@@ -1,0 +1,117 @@
+package mediaRentalManager;
+import java.util.*;
+
+public class Customer {
+	    private String name;
+	    private String address;
+	    private String plan;
+	    private ArrayList<String> requestQueue;
+	    private ArrayList<String> rentedMedia;
+	    private int rentalLimit;
+        //constructor 
+	    public Customer(String name, String address, String plan) {
+	        this.name = name;
+	        this.address = address;
+	        this.plan = plan;
+	        this.rentedMedia = new ArrayList<>();
+	        this.requestQueue = new ArrayList<>();
+	        this.rentalLimit = (plan.equals("LIMITED")) ? 2 : Integer.MAX_VALUE;
+	    }
+
+	    public String getName() {
+	        return name;
+	    }
+
+	    public String getAddress() {
+	        return address;
+	    }
+
+	    public String getPlan() {
+	        return plan;
+	    }
+
+	    public ArrayList<String> getRentedMedia() {
+	        return rentedMedia;
+	    }
+
+	    public ArrayList<String> getRequestQueue() {
+	        return requestQueue;
+	    }
+	    
+	    public int getRentalLimit() {
+	    	return rentalLimit;
+	    }
+	    
+	    public void setRentalLimit(int rentalLimit) {
+	    	this.rentalLimit = rentalLimit;
+	    }
+        
+	    public boolean addToRequestQueue(String mediaTitle) {
+	    	//adds mediaTitle if it doesn't exsist
+	    	if(!requestQueue.contains(mediaTitle)) {
+	    		requestQueue.add(mediaTitle);
+	    		return true;
+	    	}
+	    	return false;
+	    }
+	    
+	    public boolean removeFromRequestQueue(String mediaTitle) {
+	    	return requestQueue.remove(mediaTitle);
+	    }
+	    
+	    public boolean rentMedia(String mediaTitle) {
+	    	//ensures length of mediaTitle is less than the limit set 
+	    	if(rentedMedia.size() < rentalLimit) {
+	    		rentedMedia.add(mediaTitle);
+	    		return true;
+	    	}
+	    	return false;
+	    }
+	    
+	    public boolean returnMedia(String mediaTitle) {
+	    	return rentedMedia.remove(mediaTitle);
+	    }
+	    
+	    public int getCurrentlyRentedCount() {
+	    	return rentedMedia.size();
+	    }
+	    
+	    public boolean canRentMoreMedia() {
+	    	if(plan.equals("LIMITED")) {
+	    		return rentedMedia.size() < rentalLimit;
+	    	}
+	    	return true;
+	    }
+	    
+	    public String toString() {
+	    	String rentedList = "[]";
+	    	//formats the list according to the toString and adds the rentedMedia if its not empty
+	    	if(!rentedMedia.isEmpty()) {
+	    		rentedList = "[";
+	    		for(int i = 0; i < rentedMedia.size(); i++) {
+	    			rentedList += rentedMedia.get(i);
+	    			if(i < rentedMedia.size() - 1) {
+	    				rentedList += ", ";
+	    			}
+	    		}
+	    		rentedList += "]";
+	    	}
+	    	
+	    	String requestList = "[]";
+	    	//formats the list accroding to the toString and adds the requestMedia if its not empty 
+	    	if(!requestQueue.isEmpty()) {
+	    		requestList = "[";
+	    		for(int i = 0; i < requestQueue.size(); i++) {
+	    			requestList += requestQueue.get(i);
+	    			if(i < requestQueue.size() - 1) {
+	    				requestList += ", ";
+	    			}
+	    		}
+	    		requestList += "]";
+	    	}
+	    	//the intended format for output 
+	    	return "Name: " + name + ", Address: " + address + ", Plan: " + plan + "\n" + 
+	    	"Rented: " + rentedList + "\n" + "Queue: " + requestList;
+	    }
+	}
+
