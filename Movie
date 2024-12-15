@@ -1,0 +1,39 @@
+package mediaRentalManager;
+
+public class Movie implements Media{
+	private String title;
+	private int copiesAvailable;
+	private String rating;
+	
+	public Movie(String title, int copiesAvailable, String rating) {
+		this.title = title;
+		this.copiesAvailable = copiesAvailable;
+		this.rating = rating;
+	}
+	//adds and customizes each of the methods declared in Media interface to what Movie class needs from its objects
+	public String getTitle() {
+		return title;
+	}
+	
+	public int getCopiesAvailable() {
+		return copiesAvailable;
+	}
+	
+	public void decreaseCopiesAvailable() {
+		if(copiesAvailable > 0) {
+			copiesAvailable--;
+		}
+	}
+	
+	public void increaseCopiesAvailable() {
+		copiesAvailable++;
+	}
+	
+	public String getInfo() {
+		return "Title: " + title + ", Copies Available: " + copiesAvailable + ", Rating: " + rating;
+	}
+	
+	public String getRating() {
+		return rating;
+	}
+}
