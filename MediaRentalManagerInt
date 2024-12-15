@@ -1,0 +1,19 @@
+package mediaRentalManager;
+import java.util.ArrayList;
+
+ public interface MediaRentalManagerInt {
+	//all required methods created but not implemented
+	 public String getAllCustomersInfo();
+	 public String getAllMediaInfo();
+	 public boolean addToQueue(String customerName, String mediaTitle);
+	 public boolean removeFromQueue(String customerName, String mediaTitle); 
+	 public String processRequests();
+	 public boolean returnMedia(String customerName, String mediaTitle);
+	 public ArrayList<String> searchMedia(String title, String rating, String artist, String songs);
+	 
+ }
+	 
+ 
+
+
+
